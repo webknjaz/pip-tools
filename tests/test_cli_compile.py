@@ -684,8 +684,8 @@ def test_url_package(runner, line, dependency, generate_hashes):
         ["-n", "--rebuild", "--no-build-isolation"]
         + (["--generate-hashes"] if generate_hashes else []),
     )
-    assert out.exit_code == 0
     assert dependency in out.stderr
+    assert out.exit_code == 0
 
 
 @pytest.mark.parametrize(
@@ -787,13 +787,13 @@ def test_direct_reference_with_extras(runner):
             "pip-tools[testing,coverage] @ git+https://github.com/jazzband/pip-tools@6.2.0"
         )
     out = runner.invoke(cli, ["-n", "--rebuild", "--no-build-isolation"])
-    assert out.exit_code == 0
     assert (
         "pip-tools[coverage,testing] @ git+https://github.com/jazzband/pip-tools@6.2.0"
         in out.stderr
     )
     assert "pytest==" in out.stderr
     assert "pytest-cov==" in out.stderr
+    assert out.exit_code == 0
 
 
 def test_input_file_without_extension(pip_conf, runner):
