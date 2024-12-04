@@ -684,7 +684,8 @@ def test_url_package(runner, line, dependency, generate_hashes):
         ["-n", "--rebuild", "--no-build-isolation"]
         + (["--generate-hashes"] if generate_hashes else []),
     )
-    assert 0 == out.exit_code and dependency in out.stderr
+    assert dependency in out.stderr
+    assert out.exit_code == 0
 
 
 @pytest.mark.parametrize(
@@ -3455,7 +3456,13 @@ small-fake-b==0.3
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
 """
-    assert 0 == out.exit_code and expected == out.stdout, f"\n{out.stdout=}\n\n{out.stderr=}\n\n"
+    try:
+        assert out.exit_code == 0
+        assert expected == out.stdout
+    except Exception:  # pragma: no cover
+        print(out.stdout)
+        print(out.stderr)
+        raise
 
 
 @backtracking_resolver_only
