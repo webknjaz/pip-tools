@@ -185,6 +185,34 @@ def build_project_metadata(
 
 
 @contextlib.contextmanager
+def _temporary_constraints_file_set_for_pip(
+    upgrade_packages: tuple[str, ...]
+) -> Iterator[None]:
+    sentinel = object()
+    original_pip_constraint = os.getenv("PIP_CONSTRAINT", sentinel)
+    pip_constraint_was_unset = original_pip_constraint is sentinel
+
+    with tempfile.NamedTemporaryFile(mode="w+t") as tmpfile:
+        # Write packages to upgrade to a temporary file to set as
+        # constraints for the installation to the builder environment,
+        # in case build requirements are among them
+        tmpfile.write("\n".join(package for package in upgrade_packages))
+        tmpfile.flush()
+        os.environ["PIP_CONSTRAINT"] = tmpfile.name
+        try:
+            yield
+        finally:
+            if pip_constraint_was_unset:
+                del os.environ["PIP_CONSTRAINT"]
+                return
+
+            # Assert here is necessary because MyPy can't infer type
+            # narrowing in the complex case.
+            assert isinstance(original_pip_constraint, str)
+            os.environ["PIP_CONSTRAINT"] = original_pip_constraint
+
+
+@contextlib.contextmanager
 def _create_project_builder(
     src_dir: pathlib.Path,
     *,
@@ -201,16 +229,13 @@ def _create_project_builder(
         yield build.ProjectBuilder(src_dir, runner=runner)
         return
 
-    if upgrade_packages is not None:
-        # Write packages to upgrade to a temporary file to set as
-        # constraints for the installation to the builder environment,
-        # in case build requirements are among them
-        tmpfile = tempfile.NamedTemporaryFile(mode="w+t", delete=False)
-        tmpfile.write("\n".join(package for package in upgrade_packages))
-        tmpfile.flush()
-        os.environ["PIP_CONSTRAINT"] = tmpfile.name
+    maybe_pip_constrained_context = (
+        contextlib.nullcontext()
+        if upgrade_packages is None
+        else _temporary_constraints_file_set_for_pip(upgrade_packages)
+    )
 
-    with build.env.DefaultIsolatedEnv() as env:
+    with maybe_pip_constrained_context, build.env.DefaultIsolatedEnv() as env:
         builder = build.ProjectBuilder.from_isolated_env(env, src_dir, runner)
         env.install(builder.build_system_requires)
         env.install(builder.get_requires_for_build("wheel"))
