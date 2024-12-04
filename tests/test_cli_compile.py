@@ -3460,7 +3460,9 @@ small-fake-b==0.3
 
 @backtracking_resolver_only
 def test_compile_build_targets_setuptools_no_wheel_dep(
-    runner, tmp_path, current_resolver
+    runner,
+    tmp_path,
+    current_resolver,
 ):
     """
     Regression test for https://github.com/jazzband/pip-tools/pull/1681#issuecomment-2212541289

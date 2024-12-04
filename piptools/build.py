@@ -162,7 +162,10 @@ def build_project_metadata(
 
     src_dir = src_file.parent
     with _create_project_builder(
-        src_dir, upgrade_packages=upgrade_packages, isolated=isolated, quiet=quiet
+        src_dir,
+        upgrade_packages=upgrade_packages,
+        isolated=isolated,
+        quiet=quiet,
     ) as builder:
         metadata = _build_project_wheel_metadata(builder)
         extras = tuple(metadata.get_all("Provides-Extra") or ())
@@ -186,7 +189,7 @@ def build_project_metadata(
 
 @contextlib.contextmanager
 def _temporary_constraints_file_set_for_pip(
-    upgrade_packages: tuple[str, ...]
+    upgrade_packages: tuple[str, ...],
 ) -> Iterator[None]:
     sentinel = object()
     original_pip_constraint = os.getenv("PIP_CONSTRAINT", sentinel)
