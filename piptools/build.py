@@ -188,31 +188,42 @@ def build_project_metadata(
 
 
 @contextlib.contextmanager
+def _env_var(
+    env_var_name: str,
+    env_var_value: str,
+    /,
+) -> Iterator[None]:
+    sentinel = object()
+    original_pip_constraint = os.getenv(env_var_name, sentinel)
+    pip_constraint_was_unset = original_pip_constraint is sentinel
+
+    os.environ[env_var_name] = env_var_value
+    try:
+        yield
+    finally:
+        if pip_constraint_was_unset:
+            del os.environ[env_var_name]
+            return
+
+        # Assert here is necessary because MyPy can't infer type
+        # narrowing in the complex case.
+        assert isinstance(original_pip_constraint, str)
+        os.environ[env_var_name] = original_pip_constraint
+
+
+@contextlib.contextmanager
 def _temporary_constraints_file_set_for_pip(
     upgrade_packages: tuple[str, ...],
 ) -> Iterator[None]:
-    sentinel = object()
-    original_pip_constraint = os.getenv("PIP_CONSTRAINT", sentinel)
-    pip_constraint_was_unset = original_pip_constraint is sentinel
-
     with tempfile.NamedTemporaryFile(mode="w+t") as tmpfile:
         # Write packages to upgrade to a temporary file to set as
         # constraints for the installation to the builder environment,
         # in case build requirements are among them
         tmpfile.write("\n".join(package for package in upgrade_packages))
         tmpfile.flush()
-        os.environ["PIP_CONSTRAINT"] = tmpfile.name
-        try:
-            yield
-        finally:
-            if pip_constraint_was_unset:
-                del os.environ["PIP_CONSTRAINT"]
-                return
 
-            # Assert here is necessary because MyPy can't infer type
-            # narrowing in the complex case.
-            assert isinstance(original_pip_constraint, str)
-            os.environ["PIP_CONSTRAINT"] = original_pip_constraint
+        with _env_var("PIP_CONSTRAINT", tmpfile.name):
+            yield
 
 
 @contextlib.contextmanager
