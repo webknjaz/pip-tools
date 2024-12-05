@@ -249,8 +249,14 @@ def _create_project_builder(
         else _temporary_constraints_file_set_for_pip(upgrade_packages)
     )
 
-    with maybe_pip_constrained_context, build.env.DefaultIsolatedEnv() as env:
-        builder = build.ProjectBuilder.from_isolated_env(env, src_dir, runner)
+    # with maybe_pip_constrained_context, build.env.DefaultIsolatedEnv() as env:
+    # with maybe_pip_constrained_context:
+    # with contextlib.nullcontext():
+    with maybe_pip_constrained_context:
+        # builder = build.ProjectBuilder.from_isolated_env(env, src_dir, runner)
+        raise RuntimeError
+        import subprocess
+        raise subprocess.SubprocessError
         env.install(builder.build_system_requires)
         env.install(builder.get_requires_for_build("wheel"))
         yield builder
