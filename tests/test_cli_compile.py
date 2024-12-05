@@ -3514,6 +3514,7 @@ wheel==0.42.0
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
 """
+    print(f'{out=} {out.exit_code=} {out.stdout=} {out.stderr=}')
     try:
         assert out.exit_code == 0, f'{out=} {out.exit_code=} {out.stdout=} {out.stderr=}'
         assert expected == out.stdout, f'{out=} {out.exit_code=} {out.stdout=} {out.stderr=}'
