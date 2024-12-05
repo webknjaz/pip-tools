@@ -3506,6 +3506,7 @@ def test_compile_build_targets_setuptools_no_wheel_dep(
             "--output-file",
             "-",
         ],
+        catch_exceptions=True,
     )
     expected = r"""small-fake-a==0.2
 wheel==0.42.0
