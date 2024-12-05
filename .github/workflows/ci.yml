@@ -118,7 +118,7 @@ jobs:
       - name: Prepare test environment
         run: tox -vv --notest -p auto --parallel-live
       - name: Test pip ${{ matrix.pip-version }}
-        run: tox --skip-pkg-install
+        run: tox --skip-pkg-install -vvvvv
       - name: Upload coverage to Codecov
         if: >-
           !github.job_workflow_sha
