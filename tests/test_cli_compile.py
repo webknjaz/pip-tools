@@ -3515,8 +3515,8 @@ wheel==0.42.0
 # setuptools
 """
     try:
-        assert out.exit_code == 0
-        assert expected == out.stdout
+        assert out.exit_code == 0, f'{out=} {out.exit_code=} {out.stdout=} {out.stderr=}'
+        assert expected == out.stdout, f'{out=} {out.exit_code=} {out.stdout=} {out.stderr=}'
     except Exception:  # pragma: no cover
         print(out.stdout)
         print(out.stderr)
