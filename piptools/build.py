@@ -249,10 +249,11 @@ def _create_project_builder(
         else _temporary_constraints_file_set_for_pip(upgrade_packages)
     )
 
-    with maybe_pip_constrained_context, build.env.DefaultIsolatedEnv() as env:
+    with build.env.DefaultIsolatedEnv() as env:
         builder = build.ProjectBuilder.from_isolated_env(env, src_dir, runner)
-        env.install(builder.build_system_requires)
-        env.install(builder.get_requires_for_build("wheel"))
+        with maybe_pip_constrained_context:
+            env.install(builder.build_system_requires)
+            env.install(builder.get_requires_for_build("wheel"))
         yield builder
 
 
