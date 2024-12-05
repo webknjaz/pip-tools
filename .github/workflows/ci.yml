@@ -120,11 +120,6 @@ jobs:
         run: tox -vv --notest -p auto --parallel-live
       - name: Test pip ${{ matrix.pip-version }}
         run: tox --skip-pkg-install
-      - name: Setup tmate session
-        if: failure()
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
       - name: Upload coverage to Codecov
         if: >-
           !github.job_workflow_sha
