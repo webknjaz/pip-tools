@@ -219,7 +219,7 @@ def _temporary_constraints_file_set_for_pip(
         # Write packages to upgrade to a temporary file to set as
         # constraints for the installation to the builder environment,
         # in case build requirements are among them
-        tmpfile.write("\n".join(package for package in upgrade_packages))
+        tmpfile.write("\n".join(upgrade_packages))
         tmpfile.flush()
 
         with _env_var("PIP_CONSTRAINT", tmpfile.name):
