@@ -3477,6 +3477,10 @@ def test_compile_build_targets_setuptools_no_wheel_dep(
     (tmp_path / "pyproject.toml").write_text(
         dedent(
             """
+            [build-system]
+            requires = ["setuptools"]
+            build-backend = "setuptools.build_meta"
+
             [project]
             name = "foo"
             version = "0.0.1"
