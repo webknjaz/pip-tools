@@ -217,16 +217,24 @@ def _temporary_constraints_file_set_for_pip(
 ) -> Iterator[None]:
     with tempfile.NamedTemporaryFile(
         mode="w+t",
-        delete_on_close=False,
+        delete=False,  # FIXME: switch to `delete_on_close` in Python 3.12+
     ) as tmpfile:
         # Write packages to upgrade to a temporary file to set as
         # constraints for the installation to the builder environment,
         # in case build requirements are among them
         tmpfile.write("\n".join(upgrade_packages))
-        tmpfile.flush()
 
-        with _env_var("PIP_CONSTRAINT", tmpfile.name):
-            yield
+        # FIXME: replace `delete` with `delete_on_close` in Python 3.12+
+        # FIXME: and replace `.close()` with `.flush()`
+        tmpfile.close()
+
+        try:
+            with _env_var("PIP_CONSTRAINT", tmpfile.name):
+                yield
+        finally:
+            # FIXME: replace `delete` with `delete_on_close` in Python 3.12+
+            # FIXME: and drop this manual deletion
+            os.unlink(tmpfile.name)
 
 
 @contextlib.contextmanager
