@@ -215,7 +215,10 @@ def _env_var(
 def _temporary_constraints_file_set_for_pip(
     upgrade_packages: tuple[str, ...],
 ) -> Iterator[None]:
-    with tempfile.NamedTemporaryFile(mode="w+t") as tmpfile:
+    with tempfile.NamedTemporaryFile(
+        mode="w+t",
+        delete_on_close=False,
+    ) as tmpfile:
         # Write packages to upgrade to a temporary file to set as
         # constraints for the installation to the builder environment,
         # in case build requirements are among them
