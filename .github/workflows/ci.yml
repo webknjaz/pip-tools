@@ -145,7 +145,7 @@ jobs:
           - MacOS
           - Windows
         python-version:
-          - pypy-3.9
+          - pypy-3.9-v7.3.14
         pip-version:
           - supported
     env:
