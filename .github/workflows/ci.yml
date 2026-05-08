@@ -519,11 +519,13 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 1
     needs:
+      - pre-setup  # transitive, for accessing settings
       - test
     steps:
       - name: Notify Codecov that all coverage reports have been uploaded
         if: >-
           !cancelled()
+          && fromJSON(needs.pre-setup.outputs.is-upstream-repository)
         uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2  # v6.0.0
         with:
           fail_ci_if_error: true
