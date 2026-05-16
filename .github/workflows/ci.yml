@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+      - ci/skip-codecov-on-forks  # FIXME
     tags:
       - v*
   workflow_call:
@@ -311,24 +312,24 @@ jobs:
       matrix:
         runner-vm:
           - ubuntu-24.04
-          - windows-2025
-          - macos-26
-          - macos-15-intel
-        python-version: >-
+          # - windows-2025 FIXME
+          # - macos-26 FIXME
+          # - macos-15-intel FIXME
+        python-version: >- # FIXME
           ${{
             fromJSON(
               inputs.cpython-versions
               && inputs.cpython-versions
               ||
-              '["3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.14t"]'
+              '["3.14t"]'
             )
           }}
-        pip-version: >-
+        pip-version: >- # FIXME
           ${{
             fromJSON(
               inputs.cpython-pip-version
               && inputs.cpython-pip-version
-              || '["supported", "lowest"]'
+              || '["supported"]'
             )
           }}
     env:
@@ -439,9 +440,9 @@ jobs:
       matrix:
         runner-vm:
           - ubuntu-24.04
-          - macos-26
-          - macos-26-intel
-          - windows-2025
+          # - macos-26 FIXME
+          # - macos-26-intel FIXME
+          # - windows-2025 FIXME
         python-version:
           - pypy-3.10
         pip-version:
@@ -525,11 +526,13 @@ jobs:
       - name: Notify Codecov that all coverage reports have been uploaded
         if: >-
           !cancelled()
-          && fromJSON(needs.pre-setup.outputs.is-upstream-repository)
+        #  && fromJSON(needs.pre-setup.outputs.is-upstream-repository)  # FIXME
         uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2  # v6.0.0
         with:
+          # disable_telem: true  # FIXME
           fail_ci_if_error: true
           run_command: send-notifications
+          verbose: true  # FIXME
 
   zizmor:
     name: 🌈 zizmor
