@@ -4,10 +4,11 @@ on:
   merge_group:
   pull_request:
   push:
-    branches:
-      - main
-    tags:
-      - v*
+    # FIXME
+    # branches:
+    #   - main
+    # tags:
+    #   - v*
   workflow_call:
     inputs:
       cpython-pip-version:
@@ -521,11 +522,14 @@ jobs:
     needs:
       - pre-setup  # transitive, for accessing settings
       - test
+
+    continue-on-error: >-
+      ${{ fromJSON(needs.pre-setup.outputs.is-upstream-repository) }}
+
     steps:
       - name: Notify Codecov that all coverage reports have been uploaded
         if: >-
           !cancelled()
-          && fromJSON(needs.pre-setup.outputs.is-upstream-repository)
         uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2  # v6.0.0
         with:
           fail_ci_if_error: true
